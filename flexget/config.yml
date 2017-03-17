@@ -49,7 +49,7 @@ templates:
         - \bTemporada\b: {from: title}
         - /\bJapanese\b/i: {from: title}
         - /\bHindi\b/i: {from: title}
-        - /\CpasBien.io\b/i: {from: title}
+        - /\bpasBien.io\b/i: {from: title}
     content_filter:
       reject:
         - '*.rar'
@@ -112,7 +112,7 @@ tasks:
       from:
         - movie_list: watchlist_movies
     exec:
-      - '{? synodl.command ?}' "{{ url }}" paths.movies
+      - '{? synodl.command ?} {{ url }} {? paths.movies ?}'
     list_add:
       - trakt_list:
           account: '{? trakt.account ?}'

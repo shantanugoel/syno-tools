@@ -1,6 +1,6 @@
 #!/bin/sh
 
-if [ "$#" -ne 1 ]; then
+if [ "$#" -lt 1 ]; then
     echo "Illegal number of parameters"
     exit 1
 fi
