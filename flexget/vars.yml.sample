@@ -7,6 +7,5 @@ paths:
   movies: <Path>
   tv:  <Path>
 
-synodl:
-  # Relative or absolute path to syno-dl.sh
-  command: '../syno-dl/syno-dl.sh'
+join:
+  api_key: <Join API Key>

@@ -99,7 +99,7 @@ tasks:
       - torrents
     discover:
       release_estimations:
-        optimistic: 30 days
+        optimistic: 7 days
       what:
         - movie_list: watchlist_movies
       from:
@@ -113,6 +113,13 @@ tasks:
         - movie_list: watchlist_movies
     exec:
       - ../syno-dl/syno-dl.sh '{{ url }}' Media/Movies
+    notify:
+      entries:
+        title: FlexGet Download Notification
+        message: Started downloading '{{ movie_name }}'
+        via:
+          - join:
+              api_key: '{? join.api_key ?}'
     list_add:
       - trakt_list:
           account: '{? trakt.account ?}'
