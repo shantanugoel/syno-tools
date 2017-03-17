@@ -1,0 +1,12 @@
+#!/bin/sh
+
+# URL of the Syno including HTTP port for API authentication.
+# No trailing slash
+export SYNO="http://<host>:5000"
+
+# Username to auth
+export USER="<username>"
+
+# Password for the above user
+# Possible issue if it contains the & character
+export PASS="<password>"

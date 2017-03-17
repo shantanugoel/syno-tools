@@ -1,0 +1,126 @@
+variables: vars.yml
+
+templates:
+
+# Movies configuration
+  movies-1080p:
+    imdb_lookup: yes
+    movie_list: watchlist_movies
+    quality: 1080p webdl+ !10bit !h265
+    content_size:
+      min: 1000
+      max: 6000
+
+# Common Rejections
+  common-reject:
+    regexp:
+      reject:
+        - \b(s|d)ub(s|bed|lado|titulado)?\b
+        - \bhc\b
+        - \bdual\b
+        - \b3d\b
+        - \bfre(nch)?\b
+        - \bita(lian)?\b
+        - \bspa(nish)?\b
+        - \bger(man)?\b
+        - \bcastellano\b
+        - \brus(sian)?\b
+        - (s|d)ub(s|bed)?\b: {from: title}                    # Block any subbed/dubbed/etc videos
+        - \b(duo|tri|quadri|tetra|penta)logy\b: {from: title} # Block series, only accept one at a time
+        - \b3-?D\b: {from: title}                             # I don"t have any 3D displays
+        - \btrailer\b: {from: title}                          # I"ve gotten a few trailers that matched as movies. VERY annoying
+        - \bR5\b: {from: title}                               # The following are poor quality types that somehow got through the quality
+        - \bWEBSCR\b: {from: title}                           # features usually due to the title including a keyword like "720p" as well
+        - \bscreener\b: {from: title}
+        - \bTS\b: {from: title}
+        - \bCam\b: {from: title}
+        - "{C_P}": {from: title}                              # The following are groups with poor quality releases
+        - TrTd TeaM: {from: title}
+        - \[TNTVillage\]: {from: title}
+        - \[facepalm\]: {from: title}
+        - \bASAP\b: {from: title}
+        - FASTSUB: {from: title}
+        - VOSTFR: {from: title}
+        - Subtitulado: {from: title}
+        - \bNORDiC\b: {from: title}
+        - \biPad\b: {from: title}
+        - /\b(ita|ger|fra|spa|swe|nor|nordic|fr|kor|esp|nl|pl)\b/i: {from: title}
+        - \bR6\b: {from: title}
+        - \bTemporada\b: {from: title}
+        - /\bJapanese\b/i: {from: title}
+        - /\bHindi\b/i: {from: title}
+        - /\CpasBien.io\b/i: {from: title}
+    content_filter:
+      reject:
+        - '*.rar'
+        - '*.zip'
+
+# Common torrents config
+  torrents:
+    torrent_alive:
+      min_seeds: 10
+      reject_for: 15 minutes
+    magnets: yes
+    #convert_magnet:
+    #  timeout: 10 seconds
+    #  force: yes
+    # Might need to disable if you are getting errors connecting to https sources
+    # Can remove if you upgrade to python 2.7.9+ or install requests[security]
+    #verify_ssl_certificates: no
+    domain_delay:
+      thepiratebay.se: 10 seconds
+      thepiratebay.org: 10 seconds
+      nyaa.se: 3 seconds
+      extratorrent: 3 seconds
+      limetorrents: 3 seconds
+
+tasks:
+  fill-watchlist-movies:
+    priority: 10
+    trakt_list:
+      account: '{? trakt.account ?}'
+      list: watchlist
+      type: movies
+      strip_dates: yes
+    accept_all: yes
+    imdb_lookup: yes
+    list_add:
+      - movie_list: watchlist_movies
+
+
+  download-movies:
+    priority: 20
+    disable:
+      - seen
+      - seen_info_hash
+    template:
+      - movies-1080p
+      - common-reject
+      - torrents
+    discover:
+      release_estimations:
+        optimistic: 30 days
+      what:
+        - movie_list: watchlist_movies
+      from:
+        #- piratebay:
+        #    category: "highres movies"
+        - rarbg:
+            category: x264 1080p
+      interval: 1 day
+    list_match:
+      from:
+        - movie_list: watchlist_movies
+    exec:
+      - '{? synodl.command ?}' "{{ url }}" paths.movies
+    list_add:
+      - trakt_list:
+          account: '{? trakt.account ?}'
+          list: collection
+          type: movies
+    list_remove:
+      - trakt_list:
+          account: '{? trakt.account ?}'
+          list: watchlist
+          type: movies
+

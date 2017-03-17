@@ -1,0 +1,4 @@
+*
+!.gitignore
+!syno-dl.sh
+!*.sample

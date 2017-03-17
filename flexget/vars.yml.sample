@@ -1,0 +1,12 @@
+trakt:
+  account: <traktusername>
+
+paths:
+  # Paths should be absolute full paths if not using syno-dl.sh
+  # Otherwise should be starting from a shared folder onwards
+  movies: <Path>
+  tv:  <Path>
+
+synodl:
+  # Relative or absolute path to syno-dl.sh
+  command: '../syno-dl/syno-dl.sh'
