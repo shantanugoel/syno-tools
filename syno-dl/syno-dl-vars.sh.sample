@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # URL of the Syno including HTTP port for API authentication.
 # No trailing slash

@@ -112,7 +112,7 @@ tasks:
       from:
         - movie_list: watchlist_movies
     exec:
-      - '{? synodl.command ?} {{ url }} {? paths.movies ?}'
+      - ../syno-dl/syno-dl.sh '{{ url }}' Media/Movies
     list_add:
       - trakt_list:
           account: '{? trakt.account ?}'

@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # Shortcomings:
 # This script is based on the Synology Download Station V3 API published at
