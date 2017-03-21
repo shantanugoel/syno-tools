@@ -99,7 +99,7 @@ tasks:
       - torrents
     discover:
       release_estimations:
-        optimistic: 7 days
+        optimistic: 30 days
       what:
         - movie_list: watchlist_movies
       from:
