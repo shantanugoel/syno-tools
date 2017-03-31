@@ -10,8 +10,8 @@
 
 # Where should the downloaded file be saved
 DEST=$2
-# Possible issue if it contains the & character
-URI=$1
+# Encode uri to avoid issues with & character
+URI=${1//&/%26}
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 source $SCRIPT_DIR/syno-dl-vars.sh
