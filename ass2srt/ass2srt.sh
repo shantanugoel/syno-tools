@@ -6,7 +6,7 @@ srt_converted=0
 
 # Check Dependencies
 check_missing_deps() {
-    #hash mkvmerge 2>/dev/null || { echo >&2 "Install missing dependency mkvmerge"; return 0; }
+    hash mkvmerge 2>/dev/null || { echo >&2 "Install missing dependency mkvmerge"; return 0; }
     hash ffmpeg 2>/dev/null || { echo >&2 "Install missing dependency ffmpeg"; return 0; }
     return 1
 }
@@ -17,15 +17,28 @@ usage() {
 
 convert_srt() {
     echo Converting to srt for $1
-    ((srt_converted++))
+    ass_file_name=$1
+    ass_file_base=$(basename -s .ass $ass_file_name)
+    srt_file_name=${ass_file_base}.srt
+    ffmpeg -i $ass_file_name $srt_file_name 2>/dev/null
+    if [ "$?" -eq 0 ]; then
+        ((srt_converted++))
+    fi
 }
 
 extract_ass() {
     echo Extracting ass for $1
     mkv_file_base=$(basename -s .mkv $1)
-    ass_file_name=${mkv_file_base}.ass
-    ((ass_extracted++))
-    convert_srt $ass_file_name
+    mkvmerge --identify-verbose "$f" | grep subtitles | while read sub; do
+        track=$(awk -F '[ :]' '{print $3}' <<< $sub)
+        lang=$(awk -F '[ :]' '{print $20}' <<< $sub)
+        ass_file_name=${mkv_file_base}.${lang}.ass
+        mkvextract tracks "$f" "$track:$ass_file_name"
+        if [ "$?" -eq 0 ]; then
+            ((ass_extracted++))
+            convert_srt $ass_file_name
+        fi
+    done
 }
 
 ass2srt() {

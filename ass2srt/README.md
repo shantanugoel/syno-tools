@@ -6,7 +6,7 @@ This is useful for players (like many TVs, Roku etc) which can't decode the embe
 
 # Usage
 
-`./ass2srt.sh <Directory or filepath`
+`./ass2srt.sh <Directory or filepath>`
 
 # Dependencies
 Install mkvmerge (mkvtoolsnix) and ffmpeg prior to running the script
