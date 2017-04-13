@@ -61,7 +61,7 @@ ass2srtdir() {
 }
 
 main() {
-    if [ "$#" -ne 1 ]; then
+    if [ "$#" -lt 1 ]; then
         usage
         exit 1
     fi
@@ -70,14 +70,16 @@ main() {
         exit 1
     fi
 
-    if [ -f $1 ]; then
-        ass2srt $1
-    elif [ -d $1 ]; then
-        ass2srtdir $1
-    else
-        echo "Invalid argument. Not a file or dir"
-        exit 1
-    fi
+    for path in "$@"; do
+        if [ -f $path ]; then
+            ass2srt $path
+        elif [ -d $path ]; then
+            ass2srtdir $path
+        else
+            echo "Invalid argument. Not a file or dir"
+            exit 1
+        fi
+    done
 
     echo Processed $mkv_processed mkv files. Extracted $ass_extracted ass subs. Converted $srt_converted srt subs.
 }
