@@ -16,46 +16,49 @@ usage() {
 }
 
 convert_srt() {
-    echo Converting to srt for $1
-    ass_file_name=$1
-    ass_file_base=$(basename -s .ass $ass_file_name)
-    srt_file_name=${ass_file_base}.srt
-    ffmpeg -i $ass_file_name $srt_file_name 2>/dev/null
+    echo Converting to srt for "$1"
+    ass_file_name="$1"
+    ass_file_base=$(basename -s .ass "$ass_file_name")
+    srt_file_name="${ass_file_base}".srt
+    ffmpeg -i "$ass_file_name" "$srt_file_name" 2>/dev/null
     if [ "$?" -eq 0 ]; then
         ((srt_converted++))
     fi
+    rm -f "$ass_file_name"
 }
 
 extract_ass() {
-    echo Extracting ass for $1
-    mkv_file_base=$(basename -s .mkv $1)
-    mkvmerge --identify-verbose "$f" | grep subtitles | while read sub; do
+    echo Extracting ass for "$1"
+    mkv_file_name="$1"
+    mkv_file_base=$(basename -s .mkv "$mkv_file_name")
+    mkvmerge --identify-verbose "$mkv_file_name" | grep subtitles | while read sub; do
         track=$(awk -F '[ :]' '{print $3}' <<< $sub)
         lang=$(awk -F '[ :]' '{print $20}' <<< $sub)
-        ass_file_name=${mkv_file_base}.${lang}.ass
-        mkvextract tracks "$f" "$track:$ass_file_name"
+        ass_file_name="${mkv_file_base}".${lang}.ass
+        mkvextract tracks "$mkv_file_name" "$track:$ass_file_name" 2>/dev/null
         if [ "$?" -eq 0 ]; then
             ((ass_extracted++))
-            convert_srt $ass_file_name
+            convert_srt "$ass_file_name"
         fi
     done
 }
 
 ass2srt() {
-    mkv_file_name=$1
-    mkv_file_dir=$(dirname $mkv_file_name)
-    cd $mkv_file_dir
+    mkv_file_path="$1"
+    mkv_file_dir=$(dirname "$mkv_file_path")
+    mkv_file_name=$(basename "$mkv_file_path")
+    cd "$mkv_file_dir"
     ((mkv_processed++))
-    extract_ass $mkv_file_name
+    extract_ass "$mkv_file_name"
     cd -
 }
 
 ass2srtdir() {
-    cd $1
+    cd "$1"
     shopt -s globstar
     for mkv in {,**/}*.mkv
     do
-        ass2srt $mkv
+        ass2srt "$mkv"
     done
     cd -
 }
@@ -71,10 +74,11 @@ main() {
     fi
 
     for path in "$@"; do
-        if [ -f $path ]; then
-            ass2srt $path
-        elif [ -d $path ]; then
-            ass2srtdir $path
+        echo "$path"
+        if [ -f "$path" ]; then
+            ass2srt "$path"
+        elif [ -d "$path" ]; then
+            ass2srtdir "$path"
         else
             echo "Invalid argument. Not a file or dir"
             exit 1
@@ -84,4 +88,4 @@ main() {
     echo Processed $mkv_processed mkv files. Extracted $ass_extracted ass subs. Converted $srt_converted srt subs.
 }
 
-main $@
+main "$@"
